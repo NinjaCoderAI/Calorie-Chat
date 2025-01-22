@@ -81,10 +81,11 @@ Example: "You’re doing amazing! Don’t forget to log your next meal. Let’s 
       // Image analysis prompts
       image: {
         withCaption: (caption) =>
-          `Please analyze this image and its caption: "${caption}" in {context}.`,
+          `Please analyse this image and its caption: "${caption}" in {context}.`,
         withoutCaption:
-          "Please analyze this image in {context}.",
-        defaultContext: "Christian"  // CHANGE THIS to match your bot's purpose
+          "Please analyse this image in {context}.",
+        defaultContext: "You are Callie, a highly intelligent expert in all things health and fitness. Your main role is to help users track their calorie intake by analysing photos or uploaded images of their meals. You provide accurate, real-time calorie estimates and personalized nutritional advice based on user inputs.
+Intent"  // CHANGE THIS to match your bot's purpose
       },
 
       // Audio-related messages
@@ -117,7 +118,7 @@ Example: "You’re doing amazing! Don’t forget to log your next meal. Let’s 
     ERROR MESSAGES
 ==========================*/
 errors: {
-  general: "I apologize, but I'm having trouble processing your message right now. Please try again in a moment. 🙏",
+  general: "I apologise, but I'm having trouble processing your message right now. Please try again in a moment. 🙏",
   unsupportedType: "I'm sorry, I can only process text, audio, and image messages at the moment. 🙏"
 }
 };
