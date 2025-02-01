@@ -1,32 +1,53 @@
-import { WhatsAppService } from '../services/whatsappService.js';
-import { TranscriptionService } from '../services/transcriptionService.js';
-import { User } from '../models/user.js';
+import axios from 'axios';
 
-const whatsappService = new WhatsAppService();
-const transcriptionService = new TranscriptionService();
+export const handleIncomingMessage = async (body) => {
+    try {
+        const messageEvent = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-export const handleIncomingMessage = async (req, res) => {
-  try {
-    const { from, body } = req.body;
-    const user = await User.getByPhone(from);
+        if (!messageEvent) {
+            console.log('No message received.');
+            return;
+        }
 
-    if (!user) {
-      await User.create(from);
-      await whatsappService.sendMessage(from, 'Welcome! Subscribe to receive daily motivational messages.');
-      return res.status(200).send('Welcome message sent');
+        const senderId = messageEvent.from;
+        const messageText = messageEvent.text?.body || '';
+
+        console.log(`Received message from ${senderId}: ${messageText}`);
+
+        // Define response text
+        const responseText = `Hello! You said: "${messageText}"`;
+
+        // Send response back via WhatsApp API
+        await sendWhatsAppMessage(senderId, responseText);
+    } catch (error) {
+        console.error('Error processing WhatsApp message:', error);
     }
+};
 
-    if (user.subscription_status !== 'active') {
-      await whatsappService.sendMessage(from, 'Please subscribe to receive motivational messages.');
-      return res.status(200).send('Subscription prompt sent');
+const sendWhatsAppMessage = async (recipientId, message) => {
+    const WHATSAPP_API_URL = 'https://graph.facebook.com/v17.0/YOUR_PHONE_NUMBER_ID/messages';
+    const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+
+    try {
+        const response = await axios.post(
+            WHATSAPP_API_URL,
+            {
+                messaging_product: 'whatsapp',
+                recipient_type: 'individual',
+                to: recipientId,
+                type: 'text',
+                text: { body: message }
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log('WhatsApp message sent:', response.data);
+    } catch (error) {
+        console.error('Failed to send WhatsApp message:', error.response?.data || error);
     }
-
-    const message = await transcriptionService.generateMotivationalMessage('daily-wisdom');
-    await whatsappService.sendMessage(from, message);
-    
-    res.status(200).send('Message processed');
-  } catch (error) {
-    console.error('Message handling error:', error);
-    res.status(500).send('Error processing message');
-  }
 };
