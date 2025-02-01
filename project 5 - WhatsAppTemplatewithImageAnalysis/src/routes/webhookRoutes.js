@@ -1,6 +1,6 @@
-import express from 'express';
-import { handleIncomingMessage } from '../controllers/messageController.js';
-import { createSubscription } from '../controllers/paymentController.js';
+const express = require('express');
+const { handleIncomingMessage } = require('../controllers/messageController.js');
+const { createSubscription } = require('../controllers/paymentController.js');
 
 const router = express.Router();
 
