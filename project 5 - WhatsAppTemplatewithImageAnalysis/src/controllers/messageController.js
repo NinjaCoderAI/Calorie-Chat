@@ -1,4 +1,17 @@
+
+```javascript
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// Check if required environment variables are set
+const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
+const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+
+if (!WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_ACCESS_TOKEN) {
+    console.error('Missing required environment variables. Please check your .env file.');
+}
 
 export const handleIncomingMessage = async (body) => {
     try {
@@ -21,12 +34,12 @@ export const handleIncomingMessage = async (body) => {
         await sendWhatsAppMessage(senderId, responseText);
     } catch (error) {
         console.error('Error processing WhatsApp message:', error);
+        throw error; // Propagate error to the caller
     }
 };
 
 const sendWhatsAppMessage = async (recipientId, message) => {
-    const WHATSAPP_API_URL = 'https://graph.facebook.com/v17.0/YOUR_PHONE_NUMBER_ID/messages';
-    const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+    const WHATSAPP_API_URL = `https://graph.facebook.com/v17.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     try {
         const response = await axios.post(
@@ -40,14 +53,21 @@ const sendWhatsAppMessage = async (recipientId, message) => {
             },
             {
                 headers: {
-                    Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+                    'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
                     'Content-Type': 'application/json'
                 }
             }
         );
 
         console.log('WhatsApp message sent:', response.data);
+        return response.data;
     } catch (error) {
         console.error('Failed to send WhatsApp message:', error.response?.data || error);
+        throw error; // Propagate error to the caller
     }
 };
+
+export default {
+    handleIncomingMessage
+};
+```
