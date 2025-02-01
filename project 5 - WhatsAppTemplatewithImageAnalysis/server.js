@@ -5,14 +5,23 @@ import { initializeScheduledMessages } from './src/cron/subscriptionSync.js';
 
 dotenv.config();
 
+const express = require("express");
 const app = express();
-app.use(express.json());
 
-app.use('/api', webhookRoutes);
+// Root route to confirm the server is running
+app.get("/", (req, res) => {
+  res.send("Server is running! 🚀");
+});
 
-const PORT = process.env.PORT || 3000;
+// Webhook route
+app.post("/webhooks/whatsapp", (req, res) => {
+  console.log("Received webhook:", req.body);
+  res.status(200).send("Webhook received!");
+});
 
+// Use Railway-assigned port or default to 8080
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  initializeScheduledMessages();
+  console.log(`Server is running on port ${PORT}`);
+
 });
