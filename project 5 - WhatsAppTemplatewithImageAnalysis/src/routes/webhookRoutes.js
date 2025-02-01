@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 // ✅ WhatsApp Incoming Messages (POST request)
 router.post('/', async (req, res) => {
     try {
-        console.log('📩 Received WhatsApp webhook:', JSON.stringify(req.body, null, 2));
+        console.log('📩 Received WhatsApp webhook:', req.body);  // Avoid using string interpolation here
         
         // Ensure request contains a valid message
         if (req.body.object && req.body.entry) {
