@@ -1,4 +1,4 @@
-{{
+{
   "name": "caloriechat-ai",
   "version": "1.0.0",
   "description": "AI-powered WhatsApp calorie tracker with subscription service",
@@ -20,4 +20,3 @@
   "devDependencies": {
     "nodemon": "^3.0.2"
   }
-}
