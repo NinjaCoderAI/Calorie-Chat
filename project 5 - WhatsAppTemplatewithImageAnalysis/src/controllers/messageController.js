@@ -1,6 +1,6 @@
 
 ```javascript
-import axios from 'axios';
+const axios = require('axios');
 import dotenv from 'dotenv';
 
 dotenv.config();
