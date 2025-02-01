@@ -1,7 +1,7 @@
-{
-  "name": "whatsapp-motivation-bot",
+{{
+  "name": "caloriechat-ai",
   "version": "1.0.0",
-  "description": "Motivational WhatsApp chatbot with subscription service",
+  "description": "AI-powered WhatsApp calorie tracker with subscription service",
   "main": "server.js",
   "type": "module",
   "scripts": {
