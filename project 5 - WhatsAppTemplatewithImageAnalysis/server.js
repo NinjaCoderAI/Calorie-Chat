@@ -15,7 +15,23 @@ app.get("/", (req, res) => {
   res.send("Server is running! 🚀");
 });
 
-// Use webhook routes
+// WhatsApp Webhook Verification
+app.get("/webhooks/whatsapp", (req, res) => {
+  const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("Webhook Verified!");
+    res.status(200).send(challenge);
+  } else {
+    res.status(403).send("Verification failed");
+  }
+});
+
+// Use webhook routes for POST requests
 app.use("/webhooks/whatsapp", webhookRoutes);
 
 // Start scheduled tasks
@@ -26,5 +42,3 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
