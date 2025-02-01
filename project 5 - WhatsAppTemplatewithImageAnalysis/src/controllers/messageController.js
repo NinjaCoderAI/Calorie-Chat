@@ -34,7 +34,7 @@ export const handleIncomingMessage = async (body) => {
         await sendWhatsAppMessage(senderId, responseText);
     } catch (error) {
         console.error('Error processing WhatsApp message:', error);
-        throw error; // Propagate error to the caller
+        throw error;
     }
 };
 
@@ -63,7 +63,7 @@ const sendWhatsAppMessage = async (recipientId, message) => {
         return response.data;
     } catch (error) {
         console.error('Failed to send WhatsApp message:', error.response?.data || error);
-        throw error; // Propagate error to the caller
+        throw error;
     }
 };
 
