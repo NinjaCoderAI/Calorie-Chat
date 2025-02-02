@@ -1,6 +1,6 @@
-import { stripe } from '../config/stripe.js';
+const stripe = require('../config/stripe');
 
-export class PaymentService {
+class PaymentService {
   async createSubscription(phone, priceId) {
     try {
       const session = await stripe.checkout.sessions.create({
@@ -25,11 +25,17 @@ export class PaymentService {
     switch (event.type) {
       case 'checkout.session.completed':
         const { phone } = event.data.object.metadata;
-        // Update user subscription status
+        // Update user subscription status in the database
+        console.log(`Subscription created for phone: ${phone}`);
         break;
       case 'customer.subscription.deleted':
-        // Handle subscription cancellation
+        // Handle subscription cancellation (update DB, notify user, etc.)
+        console.log(`Subscription cancelled.`);
         break;
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
   }
 }
+
+module.exports = new PaymentService();I'm
