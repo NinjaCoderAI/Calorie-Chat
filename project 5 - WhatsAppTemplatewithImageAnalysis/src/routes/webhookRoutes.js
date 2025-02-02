@@ -1,6 +1,6 @@
-import express from 'express';
-import { handleIncomingMessage } from '../controllers/messageController.js';
-import { createSubscription } from '../controllers/paymentController.js';
+const express = require('express');
+const { handleIncomingMessage } = require('../controllers/messageController');
+const { createSubscription } = require('../controllers/paymentController');
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 // ✅ WhatsApp Incoming Messages (POST request)
 router.post('/', async (req, res) => {
     try {
-        console.log('📩 Received WhatsApp webhook:', req.body);  // Avoid using string interpolation here
+        console.log('📩 Received WhatsApp webhook:', req.body);
         
         // Ensure request contains a valid message
         if (req.body.object && req.body.entry) {
@@ -39,4 +39,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-export default router; // ✅ Ensure this is the default export
+module.exports = router; // ✅ Use CommonJS export
