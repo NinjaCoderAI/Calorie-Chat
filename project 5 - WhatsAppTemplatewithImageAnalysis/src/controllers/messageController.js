@@ -1,73 +1,74 @@
 
-```javascript
-const axios = require('axios');
-import dotenv from 'dotenv';
+const transcribeAudio = require('../services/transcriptionService');
+const paymentService = require('../services/paymentService');
+const databaseService = require('../services/databaseService');
+const whatsapp = require('../services/whatsappService');
+const logger = require('../utils/logger');
 
-dotenv.config();
+const SUBSCRIPTION_MESSAGE = "You're out of blessings ✝ Click here to upgrade and receive unlimited blessings 🙏 https://holywords.ai/subscribe";
 
-// Check if required environment variables are set
-const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+async function handleMessage(req, res) {
+    const entry = req.body;
 
-if (!WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_ACCESS_TOKEN) {
-    console.error('Missing required environment variables. Please check your .env file.');
-}
+    for (const e of entry) {
+        for (const change of e.changes) {
+            if (change.field === 'messages') {
+                if (change.value.messages) {
+                    for (const message of change.value.messages) {
+                        const from = message.from;
+                        const messageType = message.type;
 
-export const handleIncomingMessage = async (body) => {
-    try {
-        const messageEvent = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+                        try {
+                            if (isBlockedCountry(from)) {
+                                await whatsapp.sendText(from, BLOCKED_MESSAGE);
+                                logger.info(`Blocked message from ${from}`);
+                                continue;
+                            }
 
-        if (!messageEvent) {
-            console.log('No message received.');
-            return;
-        }
+                            let messageContent;
+                            if (messageType === 'text') {
+                                messageContent = message.text.body;
+                            } else if (messageType === 'audio') {
+                                const mediaId = message.audio.id;
+                                messageContent = await transcribeAudio(mediaId);
+                            } else {
+                                logger.info(`Unsupported message type: ${messageType}`);
+                                continue;
+                            }
 
-        const senderId = messageEvent.from;
-        const messageText = messageEvent.text?.body || '';
+                            const isSubscribed = await paymentService.checkStripeSubscription(from);
+                            const user = await databaseService.findOrCreateUser(from);
 
-        console.log(`Received message from ${senderId}: ${messageText}`);
+                            if (isSubscribed !== user.is_subscribed) {
+                                await databaseService.updateSubscription(from, isSubscribed);
+                            }
 
-        // Define response text
-        const responseText = `Hello! You said: "${messageText}"`;
+                            const messageCount = await databaseService.incrementMessageCount(from);
+                            const contextMessages = await databaseService.getConversationContext(from);
 
-        // Send response back via WhatsApp API
-        await sendWhatsAppMessage(senderId, responseText);
-    } catch (error) {
-        console.error('Error processing WhatsApp message:', error);
-        throw error;
-    }
-};
+                            let prompt;
+                            if (isSubscribed) {
+                                prompt = `Previous conversation:\n${contextMessages.map(msg => `${msg.role}: ${msg.content}`).join("\n")}\n\nUser: ${messageContent}\nAssistant:`;
+                            } else {
+                                await whatsapp.sendText(from, SUBSCRIPTION_MESSAGE);
+                                logger.info(`Handled message from ${from}`);
+                                continue;
+                            }
 
-const sendWhatsAppMessage = async (recipientId, message) => {
-    const WHATSAPP_API_URL = `https://graph.facebook.com/v17.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
+                            const aiResponse = await generateResponse(prompt);
+                            await databaseService.saveMessage(from, messageContent, aiResponse);
+                            await whatsapp.sendText(from, aiResponse);
 
-    try {
-        const response = await axios.post(
-            WHATSAPP_API_URL,
-            {
-                messaging_product: 'whatsapp',
-                recipient_type: 'individual',
-                to: recipientId,
-                type: 'text',
-                text: { body: message }
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-                    'Content-Type': 'application/json'
+                        } catch (error) {
+                            logger.error(`Error handling message from ${from}: ${error.message}`);
+                        }
+                    }
                 }
             }
-        );
-
-        console.log('WhatsApp message sent:', response.data);
-        return response.data;
-    } catch (error) {
-        console.error('Failed to send WhatsApp message:', error.response?.data || error);
-        throw error;
+        }
     }
-};
 
-export default {
-    handleIncomingMessage
-};
-```
+    res.sendStatus(200);
+}
+
+module.exports = { handleMessage };
