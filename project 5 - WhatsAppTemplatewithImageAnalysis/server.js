@@ -1,7 +1,7 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import webhookRoutes from './src/routes/webhookRoutes.js';
-import { initializeScheduledMessages } from './src/cron/subscriptionSync.js';
+const express = require('express');
+const dotenv = require('dotenv');
+const webhookRoutes = require('./src/routes/webhookRoutes');
+const { initializeScheduledMessages } = require('./src/cron/subscriptionSync');
 
 dotenv.config();
 
