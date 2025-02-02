@@ -1,6 +1,6 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export class WhatsAppService {
+class WhatsAppService {
   constructor() {
     this.accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
     this.phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
@@ -35,3 +35,5 @@ export class WhatsAppService {
     }
   }
 }
+
+module.exports = { WhatsAppService };
