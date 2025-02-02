@@ -1,6 +1,6 @@
-import { supabase } from '../config/supabase.js';
+const supabase = require('../config/supabase');
 
-export class DatabaseService {
+class DatabaseService {
   async createUser(phone) {
     const { data, error } = await supabase
       .from('users')
@@ -32,3 +32,5 @@ export class DatabaseService {
     return data;
   }
 }
+
+module.exports = new DatabaseService();
