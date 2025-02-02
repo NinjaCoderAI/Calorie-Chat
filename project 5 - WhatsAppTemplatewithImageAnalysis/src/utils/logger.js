@@ -5,4 +5,4 @@ const logger = {
   debug: (message) => console.debug(`[DEBUG] ${message}`)
 };
 
-export default logger;
+module.exports = logger;
