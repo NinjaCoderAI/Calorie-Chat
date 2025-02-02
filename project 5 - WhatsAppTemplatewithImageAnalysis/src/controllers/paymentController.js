@@ -1,13 +1,13 @@
-import { stripe } from '../config/stripe.js';
-import { User } from '../models/user.js';
-import { WhatsAppService } from '../services/whatsappService.js';
+const stripe = require('../config/stripe.js').stripe;
+const User = require('../models/user.js').User;
+const WhatsAppService = require('../services/whatsappService.js').WhatsAppService;
 
 const whatsappService = new WhatsAppService();
 
-export const createSubscription = async (req, res) => {
+const createSubscription = async (req, res) => {
   try {
     const { phone } = req.body;
-    
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -36,3 +36,5 @@ export const createSubscription = async (req, res) => {
     res.status(500).send('Error creating subscription');
   }
 };
+
+module.exports = { createSubscription };
