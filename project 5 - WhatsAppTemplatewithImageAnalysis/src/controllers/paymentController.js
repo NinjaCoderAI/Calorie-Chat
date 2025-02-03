@@ -1,8 +1,6 @@
 const stripe = require('../config/stripe.js').stripe;
 const User = require('../models/user.js').User;
-const WhatsAppService = require('../services/whatsappService.js').WhatsAppService;
-
-const whatsappService = new WhatsAppService();
+const { sendMessage } = require('../services/whatsappService');
 
 const createSubscription = async (req, res) => {
   try {
@@ -29,6 +27,9 @@ const createSubscription = async (req, res) => {
       success_url: `${process.env.DOMAIN}/success?phone=${phone}`,
       cancel_url: `${process.env.DOMAIN}/cancel`,
     });
+
+    // If you need to send a WhatsApp message, use sendMessage directly
+    // await sendMessage(someUrl, someBody);
 
     res.json({ url: session.url });
   } catch (error) {
