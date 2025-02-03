@@ -1,8 +1,8 @@
-import cron from 'node-cron';
-import { TranscriptionService } from '../services/transcriptionService.js';
-import { WhatsAppService } from '../services/whatsappService.js';
-import { User } from '../models/user.js';
-import { supabase } from '../config/supabase.js';
+const cron = require('node-cron');
+const { TranscriptionService } = require('../services/transcriptionService');
+const { WhatsAppService } = require('../services/whatsappService');
+const { User } = require('../models/user');
+const { supabase } = require('../config/supabase');
 
 const transcriptionService = new TranscriptionService();
 const whatsappService = new WhatsAppService();
@@ -14,7 +14,7 @@ const schedules = {
   'evening': '0 19 * * *'    // 7 PM
 };
 
-export const initializeScheduledMessages = () => {
+const initializeScheduledMessages = () => {
   Object.entries(schedules).forEach(([timeOfDay, schedule]) => {
     cron.schedule(schedule, async () => {
       try {
@@ -33,3 +33,5 @@ export const initializeScheduledMessages = () => {
     });
   });
 };
+
+module.exports = { initializeScheduledMessages };
