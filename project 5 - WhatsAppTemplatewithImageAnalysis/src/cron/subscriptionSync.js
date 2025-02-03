@@ -3,9 +3,6 @@ const { WhatsAppService } = require('../services/whatsappService');
 const { User } = require('../models/user');
 const { supabase } = require('../config/supabase');
 
-// Remove this line:
-// const transcriptionService = new TranscriptionService();
-const whatsappService = new WhatsAppService();
 
 // Option to add a simple message generation function
 const generateMotivationalMessage = () => {
