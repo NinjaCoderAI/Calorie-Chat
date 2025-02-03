@@ -1,7 +1,11 @@
-const fetch = require('node-fetch');
+```javascript
+// whatsappService.js
+const { promisify } = require('util');
 
 async function sendMessage(url, body) {
   try {
+    const fetch = await import('node-fetch').then(mod => mod.default);
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -15,3 +19,4 @@ async function sendMessage(url, body) {
 }
 
 module.exports = { sendMessage };
+```
