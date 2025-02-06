@@ -153,10 +153,11 @@ whatsapp: {
     DATABASE SETTINGS
 ==========================*/
 database: {
-  messageTableName: 'messages',
+  mealLogsTableName: 'meal_logs',
   userTableName: 'users',
   maxContextMessages: 10
 },
+
 
 /*==========================
     FILE HANDLING
