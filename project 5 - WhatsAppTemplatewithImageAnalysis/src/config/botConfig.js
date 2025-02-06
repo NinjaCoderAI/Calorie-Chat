@@ -104,7 +104,7 @@ Intent"  // CHANGE THIS to match your bot's purpose
   subscription: {
     messages: {
       expired:
-        "You're out of tokens. Click here to upgrade and receive unlimited messages 🙏 https://caloriech.at",
+        "You're out of tokens. Click here to upgrade and receive unlimited messages 🙏 https://buy.stripe.com/7sIg1e6vvfrt1jO4gh",
       required:
         "Please subscribe to continue using our service 🙏",
     },
